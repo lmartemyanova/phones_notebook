@@ -29,36 +29,33 @@ def format_initials(contact):
 
 
 def delete_duplicates(contacts_list):
+    merged = {}
     for contact in contacts_list:
-        if contact[0] == contact[0] and contact[1] == contact[1]:
+        name = f'{contact[0]} {contact[1]}'
+        if name in merged:
             for i, field in enumerate(contact):
                 if field == '':
                     continue
-                contact[i] = field
+                merged[name][i] = field
         else:
-            contacts_list[contact] = contact
-    # print(contacts_list)
+            merged[name] = contact
+    contacts_list = [field for field in merged.values()]
     return contacts_list
 
 
 def format_phone(old_phone):
-    # phone_pattern = r'\+?[7|8]\s*\(?\d+\)?\s*\-?\d+\-?\d+\-?\d+\s*\(?[доб.]*\s*\d+\)?'
     phone_pattern = r'(\+?[7|8])\s*\(?(\d{3,3})\)?\s*\-?(\d{3,3})\-?(\d{2,2})\-?(\d{2,2})\s*\(?[доб.]*\s*(\d+)?\)?'
-    phone = re.findall(phone_pattern, old_phone)
     if "доб." not in old_phone:
         new_phone_pattern = r'+7(\2)\3-\4-\5'
     else:
         new_phone_pattern = r'+7(\2)\3-\4-\5 доб.\6'
     normal_phone = re.sub(phone_pattern, new_phone_pattern, old_phone)
-    # print(normal_phone)
-    # email_pattern = r'[a-zA-Z0-9\.]+[^\s]@{1,1}[a-zA-Z0-9]+\.[a-zA-Z0-9]+'
-    # email = re.findall(email_pattern, old_phone)
-    # print(email)
+    print(normal_phone)
     return normal_phone
 
 
 def fill_phonebook(correct_phonebook):
-    with open("correct_phonebook.csv", "w") as f:
+    with open("correct_phonebook.csv", "w", encoding='utf-8') as f:
         datawriter = csv.writer(f, delimiter=',')
         datawriter.writerows(correct_phonebook)
         return
@@ -70,5 +67,5 @@ if __name__ == '__main__':
         contacts_list[i] = format_initials(contact)
         contacts_list[i][5] = format_phone(contact[5])
     correct_phonebook = delete_duplicates(contacts_list)
-    # fill_phonebook(correct_phonebook)
+    fill_phonebook(correct_phonebook)
 
